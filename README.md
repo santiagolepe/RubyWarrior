@@ -1,4 +1,4 @@
 RubyWarrior
 ===========
 
-juego en ruby
+Juego en ruby 
