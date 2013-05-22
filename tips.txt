@@ -1,0 +1,23 @@
+tips
+
+ @ = Octavio (20 HP) daño 5
+ C = Captive (1 HP)
+ s = Sludge (12 HP) daño 3
+ S = Thick Sludge (24 HP) daño 3
+ a = Archer (7 HP) daño 3
+ w = Wizard (3 HP) daño 11
+
+walk!
+attack!
+feel = regresa un espacio hacia atras
+health = mustra la sangre restante
+rest! = gana 10 de vida +2 por turno
+warrior.rescue! = recata cautivos
+warrior.pivot! = voltea al jugador(left, :right or :backward)
+warrior.shoot! = dispara flecha
+warrior.look = regresa array de 3 pociciones
+
+
+
+
+warrior.feel.captive? 
