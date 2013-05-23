@@ -1,6 +1,6 @@
 tips
 
- @ = Octavio (20 HP) daño 5
+ @ = Octavio (20 HP) daño 5 flecha 3
  C = Captive (1 HP)
  s = Sludge (12 HP) daño 3
  S = Thick Sludge (24 HP) daño 3
