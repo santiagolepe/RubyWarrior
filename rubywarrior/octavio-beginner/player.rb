@@ -25,7 +25,7 @@ class Player
     else
       
       #si la sangre es menor a 8 activamos la bandera
-      if warrior.health <= 8
+      if warrior.health <= 2
         @flag = true
       end
 
@@ -100,7 +100,7 @@ class Player
         else
           warrior.walk!(@dir) 
         end
-      when "Wizard"
+      when "Wizard", "Sludge", "Thick Sludge", "Archer" 
         warrior.shoot!(@dir)
       else
         warrior.walk!(@dir) 
