@@ -1,4 +1,4 @@
-implementación
+implementación  nivel Principiante
 
 nivel 1 ->
 class Player
@@ -423,3 +423,65 @@ end
 
 
 
+NIVEL INTERMEDIO
+
+nivel 1 ->
+
+class Player
+  def play_turn(warrior)
+    # add your code here
+    puts "#{warrior.direction_of_stairs}"
+    warrior.walk!(warrior.direction_of_stairs)
+  end
+end
+
+nivel 2 ->
+class Player
+  def play_turn(warrior)
+    # add your code here
+    dirS = warrior.direction_of_stairs
+    puts "#{dirS}"
+    if warrior.feel(dirS).enemy?
+      warrior.attack!(dirS)
+    else
+      warrior.walk!(dirS)
+    end
+  end
+end
+
+nivel 3 ->
+class Player
+
+  def initialize
+    @flag = false
+    @turn = 1
+  end
+
+  def play_turn(warrior)
+    # add your code here
+    dirS = warrior.direction_of_stairs
+    puts "#{warrior.health}"
+
+    if @flag
+      warrior.walk!(dirS)
+    else
+      case @turn
+      when 1
+        warrior.bind!(:backward)
+      when 2
+        warrior.bind!(:left)
+      when 3
+        warrior.bind!(:forward)
+      when 4,5,6
+        warrior.attack!(:left)
+      when 7
+        warrior.rescue!(:right)
+        @flag = true
+      end
+        
+      @turn += 1  
+    end
+  end
+end
+
+nivel 4 ->
