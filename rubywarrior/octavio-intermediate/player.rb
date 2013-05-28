@@ -10,7 +10,5 @@ class Player
     dirS = warrior.direction_of_stairs
     array = warrior.listen
     puts "#{warrior.direction_of(array[0])}"
-
-
   end
 end
