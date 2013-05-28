@@ -484,4 +484,87 @@ class Player
   end
 end
 
+
+
 nivel 4 ->
+class Player
+
+  def initialize
+    @dir = :forward
+    @flag = false
+  end
+
+  def play_turn(warrior)
+    # add your code here
+    array = warrior.listen
+    puts "#{array}"
+
+    if warrior.health < 5
+      @flag = true
+    end
+
+    if @flag
+      doLive(warrior)
+    else
+        #si no hay enemigos ni cautivos, buscamos la escalera
+       if array.length == 0
+          warrior.walk!(warrior.direction_of_stairs)
+        else
+          #establecemos la direccion del primer objetivo
+          @dir = warrior.direction_of(array[0])
+          doAction(warrior)
+        end
+    end
+
+  end
+
+
+  def doLive(warrior)
+    case warrior.feel(@dir).to_s()
+      when "Thick Sludge", "Sludge"
+        doBack(warrior)
+      else
+        warrior.rest!
+        if warrior.health > 15
+          @flag = false
+        end
+      end 
+  end
+
+
+  #da un paso atras 
+  def doBack(warrior)
+    case @dir
+    when :forward
+      warrior.walk!(:backward)
+    when :backward
+       warrior.walk!(:forward)
+    when :left
+       warrior.walk!(:right)
+     when :right
+       warrior.walk!(:left)
+     end
+  end
+
+
+  def doAction(warrior)
+    #si encontramos enemigo cerca en nuestro camino, atacamos
+    if warrior.feel(:forward).enemy?
+      warrior.attack!
+    else
+      case warrior.feel(@dir).to_s()
+      when "Captive"
+        warrior.rescue!(@dir)
+      when "Thick Sludge", "Sludge"
+        warrior.attack!(@dir)
+      else
+        warrior.walk!(@dir)
+      end 
+    end
+  end
+
+end
+
+
+nivel 5 ->
+
