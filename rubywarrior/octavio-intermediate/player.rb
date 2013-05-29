@@ -49,22 +49,13 @@ class Player
             if @surrounded and @bind
               doBind(warrior)
             else
-              #si hay 3 enemigos en fila detomamos la bomba
-              case list[0]
-              when "Thick Sludge", "Sludge"
-                case list[1]
-                when "Thick Sludge", "Sludge"
-                  case list[2]
-                   when "Thick Sludge", "Sludge"
-                      warrior.detonate!(@dir)
-                    else
-                      doAction(warrior)  
-                   end 
-                 else
-                  doAction(warrior)  
-                end
+              #si estamos buscando un cautivo y no estamos rodeados y tenemos
+              #enfrente un enemigo lo rodeamos
+              if warrior.feel(@dir).enemy? and @captive and not @surrounded
+                doElude(warrior)
               else
-                doAction(warrior)  
+                puts "#{space.ticking?}"
+                doAction(warrior)
               end
             end
           end
