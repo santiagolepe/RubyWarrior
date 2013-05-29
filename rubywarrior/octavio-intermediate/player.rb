@@ -4,6 +4,9 @@ class Player
     @dir = :forward
     @flag = false
     @pos = [:forward, :right, :backward, :left]
+    @bind = true
+    @enemys = []
+    @binded = 0
   end
 
   def play_turn(warrior)
@@ -15,8 +18,6 @@ class Player
       @flag = true
     end
 
-    puts "ES rodeado por : #{isSurrounded(warrior)} #{@dir}"
-
 
     if @flag
       doLive(warrior)
@@ -25,13 +26,22 @@ class Player
        if array.length == 0
           warrior.walk!(warrior.direction_of_stairs)
         else
-          #establecemos la direccion del primer objetivo
+          puts "#{array.to_s().include?'Captive'}"
+          puts "#{array.to_s().index('Captive')}"
+          #establecemos la direccion del primer objetivo (cautivo)
           @dir = warrior.direction_of(array[0])
           #rodeamos la escalera
           if warrior.feel(@dir).stairs?
             goEmpty(warrior)
           else
-            doAction(warrior)
+          	#si estamos rodeado por 2 o mas, los inmovilizamos
+          	isSurrounded(warrior)
+          	if @enemys.length >= 2 and @bind
+          		doBind(warrior)
+          	else
+          		doAction(warrior)
+          	end
+            
           end
         end
     end
@@ -45,7 +55,7 @@ class Player
         goEmpty(warrior)
       else
         warrior.rest!
-        if warrior.health > 15
+        if warrior.health >= 20
           @flag = false
         end
       end 
@@ -66,11 +76,7 @@ class Player
 
 
   def doAction(warrior)
-    #si encontramos enemigo cerca en nuestro camino, atacamos
-    if warrior.feel(:forward).enemy?
-      warrior.attack!
-    else
-      case warrior.feel(@dir).to_s()
+    case warrior.feel(@dir).to_s()
       when "Captive"
         warrior.rescue!(@dir)
       when "Thick Sludge", "Sludge"
@@ -78,20 +84,31 @@ class Player
       else
         warrior.walk!(@dir)
       end 
-    end
   end
 
 
   def isSurrounded(warrior)
     #devuelve las posiciones en la que esta rodeado
-    #si mas de uno
     array = []
     @pos.each do |pos|
       if warrior.feel(pos).enemy?
         array.push(pos)
       end
     end
-    return array
+    @enemys = array
+  end
+
+  def doBind(warrior)
+  	warrior.bind!(@enemys[@binded])
+  	@binded += 1
+  	#si ya se inmovilizarion todos se desactiva en bind
+  	if @enemys.length == @binded
+  		@bind = false
+  	end
+  end
+
+  def getCaptive(warrior)
+
   end
 
 end
