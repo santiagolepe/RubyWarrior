@@ -7,41 +7,66 @@ class Player
     @bind = true
     @enemys = []
     @binded = 0
+    @captive = true
+    @surrounded = false
   end
 
   def play_turn(warrior)
     # add your code here
-    array = warrior.listen
-    puts "#{array}"
+    array = warrior.listen.map{|item| item.to_s}
+    items = warrior.listen
+    list = warrior.look(@dir).map{|item| item.to_s}
+   
 
-    if warrior.health < 5
+    if warrior.health < 4
       @flag = true
     end
-
 
     if @flag
       doLive(warrior)
     else
         #si no hay enemigos ni cautivos, buscamos la escalera
-       if array.length == 0
+       if items.length == 0
           warrior.walk!(warrior.direction_of_stairs)
         else
-          puts "#{array.to_s().include?'Captive'}"
-          puts "#{array.to_s().index('Captive')}"
-          #establecemos la direccion del primer objetivo (cautivo)
-          @dir = warrior.direction_of(array[0])
+          #buscamos los cautivos
+          if array.include?'Captive' 
+            @dir = warrior.direction_of(items[array.index('Captive')])
+          else
+            #establecemos la direccion del primer objetivo 
+            @dir = warrior.direction_of(items[0])
+            @captive = false
+          end
+          
           #rodeamos la escalera
           if warrior.feel(@dir).stairs?
             goEmpty(warrior)
           else
-          	#si estamos rodeado por 2 o mas, los inmovilizamos
-          	isSurrounded(warrior)
-          	if @enemys.length >= 2 and @bind
-          		doBind(warrior)
-          	else
-          		doAction(warrior)
-          	end
-            
+             #si estamos rodeado por 2 o mas, los inmovilizamos
+            unless @surrounded
+              isSurrounded(warrior)
+            end
+            if @surrounded and @bind
+              doBind(warrior)
+            else
+              #si hay 3 enemigos en fila detomamos la bomba
+              case list[0]
+              when "Thick Sludge", "Sludge"
+                case list[1]
+                when "Thick Sludge", "Sludge"
+                  case list[2]
+                   when "Thick Sludge", "Sludge"
+                      warrior.detonate!(@dir)
+                    else
+                      doAction(warrior)  
+                   end 
+                 else
+                  doAction(warrior)  
+                end
+              else
+                doAction(warrior)  
+              end
+            end
           end
         end
     end
@@ -74,6 +99,19 @@ class Player
     end
   end
 
+  #esquivar enemigo enfrente
+  def doElude(warrior)
+    if @dir == :forward
+      if warrior.feel(:left).empty? and not warrior.feel(:left).stairs?
+        warrior.walk!(:left)
+      elsif warrior.feel(:right).empty? and not warrior.feel(:right).stairs?
+        warrior.walk!(:right)
+      end
+    elsif @dir == :right
+        warrior.walk!(:forward)
+    end
+  end
+
 
   def doAction(warrior)
     case warrior.feel(@dir).to_s()
@@ -95,7 +133,10 @@ class Player
         array.push(pos)
       end
     end
-    @enemys = array
+    if array.length >= 2
+      @enemys = array
+      @surrounded = true
+    end
   end
 
   def doBind(warrior)
@@ -105,10 +146,6 @@ class Player
   	if @enemys.length == @binded
   		@bind = false
   	end
-  end
-
-  def getCaptive(warrior)
-
   end
 
 end
