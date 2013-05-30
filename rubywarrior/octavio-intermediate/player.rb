@@ -15,11 +15,14 @@ class Player
     # add your code here
     array = warrior.listen.map{|item| item.to_s}
     items = warrior.listen
-    list = warrior.look(@dir).map{|item| item.to_s}
-   
+    list = warrior.look(@dir)
+    thick = warrior.listen.select{|feel| feel.ticking?}
 
     if warrior.health < 4
-      @flag = true
+      #si hay enemigos regeneramos la sangre
+      if array.include?'Sludge' or array.include?'Thick Sludge'
+        @flag = true   
+      end 
     end
 
     if @flag
@@ -49,13 +52,30 @@ class Player
             if @surrounded and @bind
               doBind(warrior)
             else
-              #si estamos buscando un cautivo y no estamos rodeados y tenemos
-              #enfrente un enemigo lo rodeamos
-              if warrior.feel(@dir).enemy? and @captive and not @surrounded
-                doElude(warrior)
+              #detonamos una bomba si tenemos a varios enemigos en fila o a los lados
+              if list[0].enemy? and list[1].enemy?
+                #si hay una bomba checamos que este lejos del radio de la exposion
+                if thick.any? 
+                  if warrior.distance_of(thick[0])>=3
+                    warrior.detonate!(@dir)
+                  else
+                    doAction(warrior)
+                  end
+                else
+                  if @captive
+                    doAction(warrior)
+                  else
+                    warrior.detonate!(@dir)
+                  end
+                end 
               else
-                puts "#{space.ticking?}"
-                doAction(warrior)
+                #si estamos buscando un cautivo y no estamos rodeados y tenemos
+                #enfrente un enemigo lo rodeamos
+                if warrior.feel(@dir).enemy? and @captive and not @surrounded
+                  doElude(warrior)
+                else
+                  doAction(warrior)
+                end
               end
             end
           end
@@ -71,7 +91,7 @@ class Player
         goEmpty(warrior)
       else
         warrior.rest!
-        if warrior.health >= 20
+        if warrior.health >= 18
           @flag = false
         end
       end 
@@ -117,7 +137,7 @@ class Player
 
 
   def isSurrounded(warrior)
-    #devuelve las posiciones en la que esta rodeado
+    #devuelve las posiciones en la que esta rodeado sin contar en la de enfrente
     array = []
     @pos.each do |pos|
       if warrior.feel(pos).enemy?
@@ -125,6 +145,7 @@ class Player
       end
     end
     if array.length >= 2
+      array.delete(@dir)
       @enemys = array
       @surrounded = true
     end
